@@ -73,16 +73,21 @@ public class PlatformLevel {
 		 }
 	}
 	
-	public void drawLevel()
+	public void drawLevel(int x)
 	{
 		background.draw(0, 0);
 		//floor.draw(0, 400);
-		
-		tilefloor.render(0,0,0,0,800,600);
+		if(x>400)
+		{
+			tilefloor.render(400-x,0,0,0,800,600);
+		} else {
+			tilefloor.render(0,0,0,0,800,600);
+		}
 		
 		/*for(int i=0; i<21; i++)
 		{
 			tileMap[i].draw(); //temp draw one tile
 		}*/
 	}
+	
 }

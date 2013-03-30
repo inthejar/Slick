@@ -9,38 +9,36 @@ public class Character {
 	int width;
 	float x;
 	float y;
-	
-	boolean isOnTile; //floating tile floor
-	
+
 	/*int direction; //testing for directional jump
 	int forward = 1;
 	int backward = -1; //workaround for direction names
 	int neutral = 0;
 	
 	boolean isOnGround;*/
-	
+
 	float xSpeed;
 	float ySpeed;
 	float scale;
 	double gCount;
-	
+
 	boolean fallen; //checks if fallen off map
-	
+
 	public Character()
 	{
 		life = 3;
-		
+
 		//isOnGround = true;
-		
+
 		scale = 1.0f;
 		xSpeed = 0.2f;
 		ySpeed = 0.4f; //adjusts for jumps
-		
+
 		//isOnTile = true;
-		
+
 		fallen = false;
 	}
-	
+
 	public void loadCharacterImage(String file) throws SlickException
 	{
 		characterImage = new Image(file);
@@ -49,27 +47,98 @@ public class Character {
 		x = 0; //initial position
 		y = 400 - height;
 	}
-	
+
 	public void drawCharacter()
 	{
 		characterImage.draw(x, y, scale);
 	}
-	
+
 	//jump method, make smooth
-	public void jump()
+	public void jump(int change)
 	{
 		System.out.println("jumping");
-		ySpeed = 5f; //initial velocity
+		ySpeed = 7; //initial velocity
+		//y -= ySpeed;
+		//y -= 100; //gives initial movement
 	}
-	
+
+	public void reverse(String direction) //push back
+	{
+		if(direction.equals("left"))
+		{
+			y += xSpeed;
+		}
+		else if(direction.equals("right"))
+		{
+			y -= xSpeed;
+		}
+	}
+
+	public boolean checkCollision(PlatformLevel level, GameContainer gc, String direction)
+	{
+		if(direction.equals("right"))
+		{
+			int xPos = (int)(x+width-1)/30; //divided by tile size
+			int yPos = (int)(y+height/2)/30;
+
+			System.out.println(xPos + " , " + yPos);
+
+			//simplified checker
+			if(level.barrier[xPos][yPos]) //checks with boxes tile dimensions
+			{
+				x--;
+				checkCollision(level, gc, "right");
+			}
+		}
+		else if(direction.equals("left"))
+		{
+			int xPos = (int)(x+1)/30; //divided by tile size
+			int yPos = (int)(y+height/2)/30;
+
+			System.out.println(xPos + " , " + yPos);
+
+			//simplified checker
+			if(level.barrier[xPos][yPos]) //checks with boxes tile dimensions
+			{
+				x++;
+				checkCollision(level, gc, "left");
+			}
+		}
+		else if(direction.equals("up"))
+		{
+			int xPos = (int)(x+width/2)/30; //divided by tile size
+			int yPos = (int)y/30;
+
+			System.out.println(xPos + " , " + yPos);
+
+			//simplified checker
+			if(level.barrier[xPos][yPos]) //checks with boxes tile dimensions
+			{
+				y++;
+				checkCollision(level, gc, "up");
+				ySpeed = 0;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public boolean isCollision(PlatformLevel level, GameContainer gc)
 	{
+		//Input input = gc.getInput();
+
+		//temp floor:
+		/*if(y+height>=600)
+		{
+			y = 600-height;
+		}*/
+
 		//check if any of character is touching barrier
 		int xPos = (int)x/30; //divided by tile size
 		int yPos = (int)y/30;
-		
+
 		System.out.println(xPos + " , " + yPos);
-		
+
 		//simplified checker
 		if(level.barrier[xPos][yPos]) //checks with boxes tile dimensions
 		{
@@ -77,7 +146,6 @@ public class Character {
 			return true;
 		}
 		return false;
-		
 
 		/*for(int xAxis=(int)(x/30); xAxis<Math.floor((x+width)/30);xAxis++)
 		{
@@ -91,9 +159,9 @@ public class Character {
 				}
 			}
 		}*/
-		
-		
-		
+
+
+
 		//old:
 		/*if(x+width > object.x && x < object.x+object.width
 				&& y+height >= object.y && y+height < object.y+object.height)//staying on ground
@@ -128,56 +196,29 @@ public class Character {
 			}
 		}*/
 	}
-	
+
 	public boolean isOnFloor(PlatformLevel level, GameContainer gc)
 	{
 		//Input input = gc.getInput();
-		
+
 		//temp floor:
 		if(y+height>=600)
 		{
 			y = 600-height;
 		}
-		
+
 		//check if any of character is touching barrier
 		int xPos = (int)(x+width/2)/30; //divided by tile size
 		int yPos = (int)(y+height)/30;
-		
-		System.out.println(xPos + " , " + yPos);
-		
+
+		//System.out.println(xPos + " , " + yPos);
+
 		//simplified checker
 		if(level.barrier[xPos][yPos]) //checks with boxes tile dimensions
 		{
-			System.out.println("barrier");
-			//isOnTile = true;
+			//System.out.println("is on floor");
 			return true;
 		}
 		return false;
-	}
-	
-	public double isByFloor(PlatformLevel level, GameContainer gc)
-	{
-		//Input input = gc.getInput();
-		
-		//temp floor:
-		if(y+height>=600)
-		{
-			y = 600-height;
-		}
-		
-		//check if any of character is touching barrier
-		int xPos = (int)(x+width/2)/30; //divided by tile size
-		int yPos = (int)(y+height)/30 + 1;
-		double yPs = (int)(y+height)/30 + 1;
-		System.out.println(xPos + " , " + yPos);
-		
-		//simplified checker
-		if(level.barrier[xPos][yPos]) //checks with boxes tile dimensions
-		{
-			System.out.println("tele down");
-			//isOnTile = true;
-			return yPs;
-		}
-		return 0;
 	}
 }
